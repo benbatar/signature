@@ -3,71 +3,94 @@ import React, { useState, useRef, useEffect } from 'react';
 import { SignatureData, SocialLinks } from './types';
 import SignaturePreview from './components/SignaturePreview';
 
+const DEFAULT_DATA: SignatureData = {
+  id: 'default',
+  profileName: 'Signature Standard',
+  fullName: 'Tarek Ben Bachir',
+  jobTitle: 'Agent immobilier - IPI 511 438',
+  email: 'trk@homty.be',
+  phoneWork: '+32 (2) 844 23 03',
+  phoneMobile: '+32 (0) 484 86 59 54',
+  address: 'Avenue Louise 390 (bte13)\n1050 Ixelles - Bruxelles',
+  website: 'Homty.be',
+  logoUrl: 'https://homty.be/wp-content/uploads/2021/04/Logo-Homty-White.png',
+  accentColor: '#16a34a',
+  dividerColor: '#16a34a',
+  primaryTextColor: '#1e293b',
+  logoBgColor: '#1e293b',
+  footerServices: 'Vente - Location - Gestion - Syndic',
+  logoWidth: 160,
+  iconSize: 18,
+  footerFontSize: 11,
+  nameFontSize: 22,
+  jobTitleFontSize: 14,
+  contactFontSize: 13,
+  verticalSpacing: 8,
+  logoFooterGap: 12,
+  columnGap: 40,
+  dividerWidth: 2,
+  dividerHeight: 120,
+  nameOffsetX: 0,
+  nameOffsetY: 0,
+  contactOffsetX: 0,
+  contactOffsetY: 0,
+  logoOffsetX: 0,
+  logoOffsetY: 0,
+  websiteOffsetX: 0,
+  websiteOffsetY: 0,
+  showLogoBackground: true,
+  contactVerticalAlign: 'center',
+  showFullName: true,
+  showJobTitle: true,
+  showEmail: true,
+  showPhoneWork: true,
+  showPhoneMobile: true,
+  showAddress: true,
+  showWebsite: true,
+  showSocialIcons: true,
+  nameTitleAlign: 'left',
+  contactInfoAlign: 'left',
+  websiteAlign: 'left',
+  footerTextAlign: 'left',
+  logoAlign: 'left',
+  layoutMode: 'logo-left',
+  dividerStyle: 'solid',
+  socialLinks: {
+    facebook: 'https://facebook.com/homty',
+    linkedin: 'https://linkedin.com/company/homty',
+    instagram: 'https://instagram.com/homty'
+  }
+};
+
 const App: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<'content' | 'design' | 'structure' | 'move' | 'social'>('content');
   const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [previewScale, setPreviewScale] = useState(1);
-  
-  const [data, setData] = useState<SignatureData>({
-    fullName: 'Tarek Ben Bachir',
-    jobTitle: 'Agent immobilier - IPI 511 438',
-    email: 'trk@homty.be',
-    phoneWork: '+32 (2) 844 23 03',
-    phoneMobile: '+32 (0) 484 86 59 54',
-    address: 'Avenue Louise 390 (bte13)\n1050 Ixelles - Bruxelles',
-    website: 'Homty.be',
-    logoUrl: 'https://homty.be/wp-content/uploads/2021/04/Logo-Homty-White.png',
-    accentColor: '#16a34a',
-    dividerColor: '#16a34a',
-    primaryTextColor: '#1e293b',
-    logoBgColor: '#1e293b',
-    footerServices: 'Vente - Location - Gestion - Syndic',
-    logoWidth: 160,
-    iconSize: 18,
-    footerFontSize: 11,
-    nameFontSize: 22,
-    jobTitleFontSize: 14,
-    contactFontSize: 13,
-    verticalSpacing: 8,
-    logoFooterGap: 12,
-    columnGap: 40,
-    dividerWidth: 2,
-    dividerHeight: 120,
-    nameOffsetX: 0,
-    nameOffsetY: 0,
-    contactOffsetX: 0,
-    contactOffsetY: 0,
-    logoOffsetX: 0,
-    logoOffsetY: 0,
-    websiteOffsetX: 0,
-    websiteOffsetY: 0,
-    showLogoBackground: true,
-    contactVerticalAlign: 'center',
-    showFullName: true,
-    showJobTitle: true,
-    showEmail: true,
-    showPhoneWork: true,
-    showPhoneMobile: true,
-    showAddress: true,
-    showWebsite: true,
-    showSocialIcons: true,
-    nameTitleAlign: 'left',
-    contactInfoAlign: 'left',
-    websiteAlign: 'left',
-    footerTextAlign: 'left',
-    logoAlign: 'left',
-    layoutMode: 'logo-left',
-    dividerStyle: 'solid',
-    socialLinks: {
-      facebook: 'https://facebook.com/homty',
-      linkedin: 'https://linkedin.com/company/homty',
-      instagram: 'https://instagram.com/homty'
-    }
-  });
+  const [profiles, setProfiles] = useState<SignatureData[]>([]);
+  const [data, setData] = useState<SignatureData>(DEFAULT_DATA);
 
-  // Gestion de l'échelle adaptative pour mobile
+  // Initialisation : Charger les profils depuis localStorage
   useEffect(() => {
+    const savedProfiles = localStorage.getItem('homty_signatures');
+    const lastActiveId = localStorage.getItem('homty_active_id');
+    
+    if (savedProfiles) {
+      const parsed = JSON.parse(savedProfiles);
+      setProfiles(parsed);
+      if (lastActiveId) {
+        const active = parsed.find((p: SignatureData) => p.id === lastActiveId);
+        if (active) setData(active);
+      } else if (parsed.length > 0) {
+        setData(parsed[0]);
+      }
+    } else {
+      // Premier démarrage
+      const initial = [DEFAULT_DATA];
+      setProfiles(initial);
+      localStorage.setItem('homty_signatures', JSON.stringify(initial));
+    }
+
     const handleResize = () => {
       if (window.innerWidth < 1024) {
         const scale = Math.min(1, (window.innerWidth - 40) / 600);
@@ -80,6 +103,15 @@ const App: React.FC = () => {
     handleResize();
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Sauvegarde automatique à chaque changement
+  useEffect(() => {
+    if (profiles.length > 0) {
+      const updatedProfiles = profiles.map(p => p.id === data.id ? data : p);
+      localStorage.setItem('homty_signatures', JSON.stringify(updatedProfiles));
+      localStorage.setItem('homty_active_id', data.id);
+    }
+  }, [data, profiles]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -99,6 +131,24 @@ const App: React.FC = () => {
       const reader = new FileReader();
       reader.onloadend = () => setData(prev => ({ ...prev, logoUrl: reader.result as string }));
       reader.readAsDataURL(file);
+    }
+  };
+
+  // Gestion des profils
+  const createNewProfile = () => {
+    const newId = Date.now().toString();
+    const newProfile = { ...DEFAULT_DATA, id: newId, profileName: `Nouvelle Signature ${profiles.length + 1}` };
+    const newProfiles = [...profiles, newProfile];
+    setProfiles(newProfiles);
+    setData(newProfile);
+  };
+
+  const deleteProfile = (id: string) => {
+    if (profiles.length <= 1) return alert("Vous devez garder au moins une signature.");
+    if (window.confirm("Supprimer cette signature ?")) {
+      const filtered = profiles.filter(p => p.id !== id);
+      setProfiles(filtered);
+      setData(filtered[0]);
     }
   };
 
@@ -139,26 +189,23 @@ const App: React.FC = () => {
 
   return (
     <div className="h-screen bg-slate-50 flex flex-col overflow-hidden font-sans">
-      {/* Header Compact */}
       <header className="h-14 lg:h-16 bg-white border-b border-slate-200 px-4 lg:px-8 flex items-center justify-between z-50 shadow-sm shrink-0">
         <div className="flex items-center gap-2 lg:gap-4">
           <div className="w-8 h-8 lg:w-10 lg:h-10 bg-emerald-600 rounded-lg lg:rounded-xl flex items-center justify-center text-white font-black text-lg lg:text-xl italic shadow-lg shadow-emerald-200/50">H</div>
           <h1 className="text-sm lg:text-lg font-bold text-slate-800 tracking-tight hidden sm:block">Studio Signature <span className="text-emerald-500 font-black">2.5</span></h1>
         </div>
-        <button 
-          onClick={copySignature}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 lg:px-8 py-2 rounded-lg lg:rounded-xl text-xs lg:text-sm font-bold transition-all shadow-lg shadow-emerald-600/20 active:scale-95"
-        >
-          Copier
-        </button>
+        <div className="flex items-center gap-3">
+           <button 
+            onClick={copySignature}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 lg:px-8 py-2 rounded-lg lg:rounded-xl text-xs lg:text-sm font-bold transition-all shadow-lg shadow-emerald-600/20 active:scale-95"
+          >
+            Copier
+          </button>
+        </div>
       </header>
 
       <main className="flex-1 flex flex-col lg:flex-row overflow-hidden relative">
-        
-        {/* SECTION APERÇU (TOP sur mobile, RIGHT sur desktop) */}
         <div className="order-1 lg:order-2 flex-1 bg-[#f1f5f9] flex flex-col items-center justify-center overflow-hidden relative bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:20px_20px] lg:[background-size:24px_24px] min-h-[35vh] lg:min-h-0 border-b lg:border-none border-slate-200">
-          
-          {/* Badge Mode */}
           <div className="absolute top-4 lg:top-8 left-1/2 -translate-x-1/2 z-40 hidden sm:block">
              <div className="px-4 py-1.5 bg-white/90 backdrop-blur-xl rounded-full shadow-lg border border-white flex items-center gap-4">
                 <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Preview</span>
@@ -174,31 +221,19 @@ const App: React.FC = () => {
               className={`bg-white rounded-3xl lg:rounded-[56px] shadow-2xl transition-all duration-500 border border-white overflow-hidden flex flex-col mx-auto ${viewMode === 'desktop' ? 'w-full max-w-4xl' : 'w-[320px] lg:w-[400px]'}`}
               style={{ transform: `scale(${previewScale})`, transformOrigin: 'center' }}
             >
-              {/* Fake Email Header */}
               <div className="bg-[#f8fafc] px-6 lg:px-10 py-4 lg:py-6 border-b border-slate-100 flex items-center gap-2 lg:gap-3 shrink-0">
                 <div className="w-2 h-2 lg:w-3 lg:h-3 rounded-full bg-rose-400/50" />
                 <div className="w-2 h-2 lg:w-3 lg:h-3 rounded-full bg-amber-400/50" />
                 <div className="w-2 h-2 lg:w-3 lg:h-3 rounded-full bg-emerald-400/50" />
               </div>
-              
               <div className="flex-1 flex items-center justify-center bg-white min-h-[180px] lg:min-h-[400px] overflow-hidden p-4 lg:p-8">
                 <SignaturePreview data={data} />
-              </div>
-
-              <div className="bg-[#f8fafc]/95 px-6 lg:px-10 py-3 lg:py-4 border-t border-slate-100 flex justify-between items-center text-[8px] lg:text-[9px] font-black text-slate-300 tracking-[0.2em] uppercase shrink-0">
-                <span>Rendering Engine</span>
-                <div className="flex items-center gap-2">
-                   <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                   <span className="text-emerald-500/50">Live</span>
-                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* SECTION CONTRÔLES (BOTTOM sur mobile, LEFT sur desktop) */}
         <aside className="order-2 lg:order-1 w-full lg:w-[420px] xl:w-[480px] bg-white lg:border-r border-slate-200 flex flex-col shrink-0 z-50 h-[55vh] lg:h-full shadow-[0_-8px_30px_rgba(0,0,0,0.05)] lg:shadow-none">
-          {/* Tabs Navigation */}
           <nav className="flex border-b border-slate-100 overflow-x-auto scrollbar-hide bg-white sticky top-0 z-10">
             {[
               { id: 'content', label: 'Infos' },
@@ -220,31 +255,70 @@ const App: React.FC = () => {
             ))}
           </nav>
 
-          {/* Form Content */}
           <div className="flex-1 overflow-y-auto p-5 lg:p-6 space-y-8 scrollbar-hide pb-20 lg:pb-6">
             {activeTab === 'content' && (
-              <div className="space-y-6 animate-in slide-in-from-left-2 duration-300">
-                {[
-                  { id: 'fullName', label: 'Nom Complet', showId: 'showFullName' },
-                  { id: 'jobTitle', label: 'Titre / Fonction', showId: 'showJobTitle' },
-                  { id: 'email', label: 'Email Professionnel', showId: 'showEmail' },
-                  { id: 'phoneMobile', label: 'Téléphone Mobile', showId: 'showPhoneMobile' },
-                  { id: 'phoneWork', label: 'Téléphone Fixe', showId: 'showPhoneWork' },
-                  { id: 'address', label: 'Adresse Physique', showId: 'showAddress', multi: true },
-                  { id: 'footerServices', label: 'Slogan / Services bas', multi: true },
-                ].map(f => (
-                  <div key={f.id}>
-                    <div className="flex justify-between items-center mb-1.5 px-1">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{f.label}</label>
-                      {f.showId && <input type="checkbox" name={f.showId} checked={(data as any)[f.showId]} onChange={handleInputChange} className="w-4 h-4 accent-emerald-600 rounded cursor-pointer" />}
+              <div className="space-y-8 animate-in slide-in-from-left-2 duration-300">
+                {/* GESTION DES PROFILS */}
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-4">
+                   <div className="flex justify-between items-center">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mes Signatures</label>
+                      <button onClick={createNewProfile} className="text-[10px] font-black text-emerald-600 uppercase hover:bg-emerald-100 px-2 py-1 rounded transition-colors">+ Nouveau</button>
+                   </div>
+                   <div className="flex flex-wrap gap-2">
+                      {profiles.map(p => (
+                        <div key={p.id} className="relative group">
+                          <button 
+                            onClick={() => setData(p)}
+                            className={`px-3 py-2 rounded-xl text-xs font-bold border transition-all ${data.id === p.id ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white text-slate-600 border-slate-200 hover:border-emerald-300'}`}
+                          >
+                            {p.profileName}
+                          </button>
+                          {profiles.length > 1 && (
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); deleteProfile(p.id); }}
+                              className="absolute -top-1 -right-1 bg-rose-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              ×
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                   </div>
+                   <div className="pt-2">
+                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Nom du profil actuel</label>
+                      <input 
+                        type="text" 
+                        name="profileName" 
+                        value={data.profileName} 
+                        onChange={handleInputChange} 
+                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
+                      />
+                   </div>
+                </div>
+
+                <div className="space-y-6">
+                  {[
+                    { id: 'fullName', label: 'Nom Complet', showId: 'showFullName' },
+                    { id: 'jobTitle', label: 'Titre / Fonction', showId: 'showJobTitle' },
+                    { id: 'email', label: 'Email Professionnel', showId: 'showEmail' },
+                    { id: 'phoneMobile', label: 'Téléphone Mobile', showId: 'showPhoneMobile' },
+                    { id: 'phoneWork', label: 'Téléphone Fixe', showId: 'showPhoneWork' },
+                    { id: 'address', label: 'Adresse Physique', showId: 'showAddress', multi: true },
+                    { id: 'footerServices', label: 'Slogan / Services bas', multi: true },
+                  ].map(f => (
+                    <div key={f.id}>
+                      <div className="flex justify-between items-center mb-1.5 px-1">
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{f.label}</label>
+                        {f.showId && <input type="checkbox" name={f.showId} checked={(data as any)[f.showId]} onChange={handleInputChange} className="w-4 h-4 accent-emerald-600 rounded cursor-pointer" />}
+                      </div>
+                      {f.multi ? (
+                        <textarea name={f.id} value={(data as any)[f.id]} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-emerald-500 outline-none transition-all resize-none" rows={2} />
+                      ) : (
+                        <input type="text" name={f.id} value={(data as any)[f.id]} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-emerald-500 outline-none transition-all" />
+                      )}
                     </div>
-                    {f.multi ? (
-                      <textarea name={f.id} value={(data as any)[f.id]} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-emerald-500 outline-none transition-all resize-none" rows={2} />
-                    ) : (
-                      <input type="text" name={f.id} value={(data as any)[f.id]} onChange={handleInputChange} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-emerald-500 outline-none transition-all" />
-                    )}
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
 
@@ -401,10 +475,7 @@ const App: React.FC = () => {
             )}
           </div>
         </aside>
-
       </main>
-
-      {/* Footer Mobile Info */}
       <div className="lg:hidden h-10 bg-white border-t border-slate-100 flex items-center justify-center px-4 z-50">
         <span className="text-[8px] font-black text-slate-400 uppercase tracking-[0.3em]">Homty Studio v2.5 Mobile</span>
       </div>

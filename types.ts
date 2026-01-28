@@ -7,6 +7,8 @@ export interface SocialLinks {
 }
 
 export interface SignatureData {
+  id: string;
+  profileName: string;
   fullName: string;
   jobTitle: string;
   email: string;
@@ -20,7 +22,6 @@ export interface SignatureData {
   primaryTextColor: string;
   footerServices: string;
   logoBgColor: string;
-  // Contrôles granulaires
   logoWidth: number;
   iconSize: number;
   footerFontSize: number;
@@ -33,7 +34,6 @@ export interface SignatureData {
   dividerWidth: number;
   dividerHeight: number;
   socialLinks: SocialLinks;
-  // Décalages de précision (X et Y pour déplacement libre)
   nameOffsetX: number;
   nameOffsetY: number;
   contactOffsetX: number;
@@ -42,10 +42,8 @@ export interface SignatureData {
   logoOffsetY: number;
   websiteOffsetX: number;
   websiteOffsetY: number;
-  // Options
   showLogoBackground: boolean;
   contactVerticalAlign: 'flex-start' | 'center' | 'flex-end';
-  // Visibilité
   showFullName: boolean;
   showJobTitle: boolean;
   showEmail: boolean;
@@ -54,13 +52,11 @@ export interface SignatureData {
   showAddress: boolean;
   showWebsite: boolean;
   showSocialIcons: boolean;
-  // Alignements
   nameTitleAlign: 'left' | 'center' | 'right';
   contactInfoAlign: 'left' | 'center' | 'right';
   websiteAlign: 'left' | 'center' | 'right';
   footerTextAlign: 'left' | 'center' | 'right';
   logoAlign: 'left' | 'center' | 'right';
-  // Structure Globale
   layoutMode: 'logo-left' | 'logo-right' | 'logo-top' | 'logo-bottom';
   dividerStyle: 'solid' | 'dashed' | 'none';
 }
