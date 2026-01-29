@@ -422,6 +422,7 @@ const App: React.FC = () => {
                      { id: 'nameFontSize', label: 'Taille Nom', min: 14, max: 50 },
                      { id: 'jobTitleFontSize', label: 'Taille Titre', min: 8, max: 40 },
                      { id: 'contactFontSize', label: 'Taille Infos', min: 8, max: 25 },
+                     { id: 'footerFontSize', label: 'Taille Slogan', min: 6, max: 25 },
                      { id: 'verticalSpacing', label: 'Espacement Lignes', min: 0, max: 40 },
                    ].map(s => (
                      <div key={s.id}>

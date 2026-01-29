@@ -189,10 +189,10 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
       <div style={{ 
         display: 'flex', 
         flexDirection: getFlexDirection(),
-        alignItems: isVertical ? 'center' : 'stretch',
+        alignItems: isVertical ? 'center' : 'center', // Fixé à center pour stabiliser la ligne
         gap: isVertical ? '0px' : `${data.columnGap}px`,
       }}>
-        {LogoBlock}
+        <div style={{ display: 'flex', alignItems: 'center' }}>{LogoBlock}</div>
 
         {data.dividerWidth > 0 && (
           <div style={{ 
@@ -205,11 +205,12 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
               width: isVertical ? `${data.dividerHeight}px` : `${data.dividerWidth}px`, 
               height: isVertical ? `${data.dividerWidth}px` : `${data.dividerHeight}px`, 
               backgroundColor: data.dividerColor,
+              borderRadius: '2px'
             }} />
           </div>
         )}
 
-        {InfoBlock}
+        <div style={{ display: 'flex', alignItems: 'center' }}>{InfoBlock}</div>
       </div>
     </div>
   );
