@@ -70,7 +70,6 @@ const App: React.FC = () => {
   const [profiles, setProfiles] = useState<SignatureData[]>([]);
   const [data, setData] = useState<SignatureData>(DEFAULT_DATA);
 
-  // Initialisation : Charger les profils depuis localStorage
   useEffect(() => {
     const savedProfiles = localStorage.getItem('homty_signatures');
     const lastActiveId = localStorage.getItem('homty_active_id');
@@ -85,7 +84,6 @@ const App: React.FC = () => {
         setData(parsed[0]);
       }
     } else {
-      // Premier démarrage
       const initial = [DEFAULT_DATA];
       setProfiles(initial);
       localStorage.setItem('homty_signatures', JSON.stringify(initial));
@@ -104,7 +102,6 @@ const App: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Sauvegarde automatique à chaque changement
   useEffect(() => {
     if (profiles.length > 0) {
       const updatedProfiles = profiles.map(p => p.id === data.id ? data : p);
@@ -134,7 +131,6 @@ const App: React.FC = () => {
     }
   };
 
-  // Gestion des profils
   const createNewProfile = () => {
     const newId = Date.now().toString();
     const newProfile = { ...DEFAULT_DATA, id: newId, profileName: `Nouvelle Signature ${profiles.length + 1}` };
@@ -163,7 +159,7 @@ const App: React.FC = () => {
         onClick={() => setData(prev => ({ ...prev, [name]: type }))}
         className={`p-2 rounded-lg transition-all ${current === type ? 'bg-emerald-600 text-white shadow-md' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}
       >
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           {icons[type]}
         </svg>
       </button>
@@ -258,7 +254,6 @@ const App: React.FC = () => {
           <div className="flex-1 overflow-y-auto p-5 lg:p-6 space-y-8 scrollbar-hide pb-20 lg:pb-6">
             {activeTab === 'content' && (
               <div className="space-y-8 animate-in slide-in-from-left-2 duration-300">
-                {/* GESTION DES PROFILS */}
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-4">
                    <div className="flex justify-between items-center">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Mes Signatures</label>
@@ -284,16 +279,6 @@ const App: React.FC = () => {
                         </div>
                       ))}
                    </div>
-                   <div className="pt-2">
-                      <label className="text-[9px] font-black text-slate-400 uppercase mb-1 block">Nom du profil actuel</label>
-                      <input 
-                        type="text" 
-                        name="profileName" 
-                        value={data.profileName} 
-                        onChange={handleInputChange} 
-                        className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold focus:ring-2 focus:ring-emerald-500 outline-none"
-                      />
-                   </div>
                 </div>
 
                 <div className="space-y-6">
@@ -304,6 +289,7 @@ const App: React.FC = () => {
                     { id: 'phoneMobile', label: 'Téléphone Mobile', showId: 'showPhoneMobile' },
                     { id: 'phoneWork', label: 'Téléphone Fixe', showId: 'showPhoneWork' },
                     { id: 'address', label: 'Adresse Physique', showId: 'showAddress', multi: true },
+                    { id: 'website', label: 'Site Web', showId: 'showWebsite' },
                     { id: 'footerServices', label: 'Slogan / Services bas', multi: true },
                   ].map(f => (
                     <div key={f.id}>
@@ -325,7 +311,7 @@ const App: React.FC = () => {
             {activeTab === 'structure' && (
               <div className="space-y-8 animate-in slide-in-from-right-2 duration-300">
                 <div>
-                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Disposition du Logo</label>
+                  <label className="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Disposition Générale</label>
                   <div className="grid grid-cols-4 gap-2">
                     {[
                       { id: 'logo-left', label: 'Gauche', icon: '←' },
@@ -364,11 +350,12 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="space-y-6">
-                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b pb-2">Alignements</h4>
+                  <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b pb-2">Alignements de Texte</h4>
                   {[
                     { label: 'Logo & Pied', name: 'logoAlign', current: data.logoAlign },
                     { label: 'Nom & Titre', name: 'nameTitleAlign', current: data.nameTitleAlign },
                     { label: 'Coordonnées', name: 'contactInfoAlign', current: data.contactInfoAlign },
+                    { label: 'Site & Social', name: 'websiteAlign', current: data.websiteAlign },
                   ].map(align => (
                     <div key={align.name} className="flex items-center justify-between">
                       <span className="text-[11px] font-bold text-slate-600">{align.label}</span>
@@ -390,10 +377,11 @@ const App: React.FC = () => {
                     { label: 'Bloc Logo', x: 'logoOffsetX', y: 'logoOffsetY' },
                     { label: 'Bloc Nom & Titre', x: 'nameOffsetX', y: 'nameOffsetY' },
                     { label: 'Bloc Coordonnées', x: 'contactOffsetX', y: 'contactOffsetY' },
+                    { label: 'Bloc Site & Social', x: 'websiteOffsetX', y: 'websiteOffsetY' },
                   ].map(block => (
                     <div key={block.label} className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-4 shadow-sm">
                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{block.label}</p>
-                      <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
                         <div>
                           <div className="flex justify-between mb-1">
                             <span className="text-[9px] font-bold text-slate-500 uppercase">Axe X</span>
@@ -432,6 +420,7 @@ const App: React.FC = () => {
                    {[
                      { id: 'logoWidth', label: 'Largeur Logo', min: 40, max: 400 },
                      { id: 'nameFontSize', label: 'Taille Nom', min: 14, max: 50 },
+                     { id: 'jobTitleFontSize', label: 'Taille Titre', min: 8, max: 40 },
                      { id: 'contactFontSize', label: 'Taille Infos', min: 8, max: 25 },
                      { id: 'verticalSpacing', label: 'Espacement Lignes', min: 0, max: 40 },
                    ].map(s => (

@@ -20,20 +20,19 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
     return 'flex-start';
   };
 
-  // Styles de base pour les blocs mobiles
   const blockStyle = (x: number, y: number) => ({
     transform: `translate(${x}px, ${y}px)`,
-    transition: 'none', // Pour une réponse immédiate aux sliders
+    transition: 'none',
   });
 
   const isVertical = data.layoutMode === 'logo-top' || data.layoutMode === 'logo-bottom';
 
-  // --- COMPOSANTS INTERNES ---
+  // --- COMPOSANTS ---
 
   const LogoBlock = (
     <div style={{ 
       ...blockStyle(data.logoOffsetX, data.logoOffsetY),
-      display: 'flex',
+      display: 'inline-flex',
       flexDirection: 'column',
       alignItems: getFlexAlign(data.logoAlign),
       textAlign: data.logoAlign as any,
@@ -47,34 +46,28 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        overflow: 'hidden'
       }}>
         {data.logoUrl ? (
-          <img 
-            src={data.logoUrl} 
-            alt="Logo" 
-            style={{ width: '100%', height: 'auto', display: 'block' }} 
-          />
+          <img src={data.logoUrl} alt="Logo" style={{ width: '100%', height: 'auto', display: 'block' }} />
         ) : (
           <div style={{ color: '#ccc', fontSize: '12px', fontWeight: 'bold' }}>LOGO</div>
         )}
       </div>
       
-      {/* Footer Services */}
       <div style={{ 
         color: data.primaryTextColor,
         fontSize: `${data.footerFontSize}px`,
         width: `${data.logoWidth + (data.showLogoBackground ? 30 : 0)}px`,
         textAlign: data.footerTextAlign as any,
         fontWeight: '700',
-        lineHeight: '1.4',
+        lineHeight: '1.2',
         fontFamily: "'Inter', sans-serif"
       }}>
         {data.footerServices.split('-').map((service, idx, arr) => (
           <React.Fragment key={idx}>
             <span style={{ whiteSpace: 'nowrap' }}>{service.trim()}</span>
             {idx < arr.length - 1 && (
-              <span style={{ color: data.accentColor, margin: '0 5px' }}>-</span>
+              <span style={{ color: data.accentColor, margin: '0 4px' }}>-</span>
             )}
           </React.Fragment>
         ))}
@@ -87,17 +80,15 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
       ...blockStyle(data.contactOffsetX, data.contactOffsetY),
       display: 'flex',
       flexDirection: 'column',
-      alignItems: getFlexAlign(data.contactInfoAlign),
       justifyContent: isVertical ? 'flex-start' : data.contactVerticalAlign,
-      textAlign: data.contactInfoAlign as any,
-      fontFamily: "'Inter', sans-serif"
+      fontFamily: "'Inter', sans-serif",
+      minWidth: '200px'
     }}>
-      {/* Nom & Titre */}
+      {/* 1. Bloc Nom & Titre */}
       <div style={{ 
         ...blockStyle(data.nameOffsetX, data.nameOffsetY),
         marginBottom: `${data.verticalSpacing}px`,
         textAlign: data.nameTitleAlign as any,
-        width: '100%'
       }}>
         {data.showFullName && (
           <div style={{ 
@@ -116,60 +107,60 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
             fontSize: `${data.jobTitleFontSize}px`, 
             opacity: 0.7, 
             fontWeight: '500',
-            marginTop: '2px'
+            marginTop: '1px'
           }}>
             {data.jobTitle}
           </div>
         )}
       </div>
 
-      {/* Coordonnées */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: `${data.verticalSpacing}px`, width: '100%' }}>
+      {/* 2. Bloc Coordonnées (Chaque ligne est indépendante) */}
+      <div style={{ textAlign: data.contactInfoAlign as any }}>
         {data.showEmail && data.email && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: getFlexAlign(data.contactInfoAlign) }}>
+          <div style={{ marginBottom: `${data.verticalSpacing}px`, display: 'flex', alignItems: 'center', gap: '8px', justifyContent: getFlexAlign(data.contactInfoAlign) }}>
             <EmailIcon color={data.accentColor} size={data.iconSize} />
-            <a href={`mailto:${data.email}`} style={{ color: data.primaryTextColor, fontSize: `${data.contactFontSize}px`, textDecoration: 'none', fontWeight: '600' }}>{data.email}</a>
+            <a href={`mailto:${data.email}`} style={{ color: data.primaryTextColor, fontSize: `${data.contactFontSize}px`, textDecoration: 'none', fontWeight: '600', lineHeight: '1' }}>{data.email}</a>
           </div>
         )}
         {data.showPhoneWork && data.phoneWork && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: getFlexAlign(data.contactInfoAlign) }}>
+          <div style={{ marginBottom: `${data.verticalSpacing}px`, display: 'flex', alignItems: 'center', gap: '8px', justifyContent: getFlexAlign(data.contactInfoAlign) }}>
             <PhoneIcon color={data.accentColor} size={data.iconSize} />
-            <a href={formatTel(data.phoneWork)} style={{ color: data.primaryTextColor, fontSize: `${data.contactFontSize}px`, textDecoration: 'none', fontWeight: '600' }}>{data.phoneWork}</a>
+            <a href={formatTel(data.phoneWork)} style={{ color: data.primaryTextColor, fontSize: `${data.contactFontSize}px`, textDecoration: 'none', fontWeight: '600', lineHeight: '1' }}>{data.phoneWork}</a>
           </div>
         )}
         {data.showPhoneMobile && data.phoneMobile && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: getFlexAlign(data.contactInfoAlign) }}>
+          <div style={{ marginBottom: `${data.verticalSpacing}px`, display: 'flex', alignItems: 'center', gap: '8px', justifyContent: getFlexAlign(data.contactInfoAlign) }}>
             <MobileIcon color={data.accentColor} size={data.iconSize} />
-            <a href={formatTel(data.phoneMobile)} style={{ color: data.primaryTextColor, fontSize: `${data.contactFontSize}px`, textDecoration: 'none', fontWeight: '600' }}>{data.phoneMobile}</a>
+            <a href={formatTel(data.phoneMobile)} style={{ color: data.primaryTextColor, fontSize: `${data.contactFontSize}px`, textDecoration: 'none', fontWeight: '600', lineHeight: '1' }}>{data.phoneMobile}</a>
           </div>
         )}
         {data.showAddress && data.address && (
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', justifyContent: getFlexAlign(data.contactInfoAlign) }}>
+          <div style={{ marginBottom: `${data.verticalSpacing}px`, display: 'flex', alignItems: 'flex-start', gap: '8px', justifyContent: getFlexAlign(data.contactInfoAlign) }}>
             <div style={{ marginTop: '2px' }}><MapPinIcon color={data.accentColor} size={data.iconSize} /></div>
-            <div style={{ color: data.primaryTextColor, fontSize: `${data.contactFontSize}px`, lineHeight: '1.4', fontWeight: '600' }}>
+            <div style={{ color: data.primaryTextColor, fontSize: `${data.contactFontSize}px`, lineHeight: '1.2', fontWeight: '600' }}>
               {data.address.split('\n').map((line, i) => <div key={i}>{line}</div>)}
             </div>
           </div>
         )}
       </div>
 
-      {/* Website & Social */}
+      {/* 3. Bloc Website & Social */}
       <div style={{ 
         ...blockStyle(data.websiteOffsetX, data.websiteOffsetY),
-        marginTop: '15px',
-        width: '100%',
+        marginTop: '10px',
         display: 'flex',
         flexDirection: 'column',
-        alignItems: getFlexAlign(data.websiteAlign)
+        alignItems: getFlexAlign(data.websiteAlign),
+        textAlign: data.websiteAlign as any
       }}>
         {data.showWebsite && data.website && (
-          <div style={{ marginBottom: '10px' }}>
-            <a href={formatUrl(data.website)} target="_blank" rel="noopener noreferrer" style={{ color: data.primaryTextColor, fontSize: `${data.nameFontSize * 0.7}px`, fontWeight: '900', textDecoration: 'none', letterSpacing: '-0.01em' }}>{data.website}</a>
+          <div style={{ marginBottom: '8px' }}>
+            <a href={formatUrl(data.website)} target="_blank" rel="noopener noreferrer" style={{ color: data.primaryTextColor, fontSize: `${data.nameFontSize * 0.65}px`, fontWeight: '900', textDecoration: 'none', letterSpacing: '-0.01em', lineHeight: '1' }}>{data.website}</a>
           </div>
         )}
         
         {data.showSocialIcons && (
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: 'flex', gap: '10px', justifyContent: getFlexAlign(data.websiteAlign) }}>
             {data.socialLinks.facebook && <a href={formatUrl(data.socialLinks.facebook)}><FacebookIcon color={data.accentColor} size={data.iconSize + 2} /></a>}
             {data.socialLinks.instagram && <a href={formatUrl(data.socialLinks.instagram)}><InstagramIcon color={data.accentColor} size={data.iconSize + 2} /></a>}
             {data.socialLinks.linkedin && <a href={formatUrl(data.socialLinks.linkedin)}><LinkedinIcon color={data.accentColor} size={data.iconSize + 2} /></a>}
@@ -179,8 +170,6 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
       </div>
     </div>
   );
-
-  // --- STRUCTURE FINALE ---
 
   const getFlexDirection = () => {
     if (data.layoutMode === 'logo-left') return 'row';
@@ -193,7 +182,7 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
   return (
     <div id="signature-container" style={{ 
       backgroundColor: '#ffffff', 
-      padding: '40px', 
+      padding: '30px', 
       display: 'inline-block',
       fontFamily: "'Inter', sans-serif"
     }}>
@@ -201,7 +190,7 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
         display: 'flex', 
         flexDirection: getFlexDirection(),
         alignItems: isVertical ? 'center' : 'stretch',
-        gap: isVertical ? '0px' : `${data.columnGap}px`
+        gap: isVertical ? '0px' : `${data.columnGap}px`,
       }}>
         {LogoBlock}
 
@@ -210,13 +199,12 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center',
-            padding: isVertical ? '20px 0' : '0'
+            padding: isVertical ? '15px 0' : '0'
           }}>
             <div style={{ 
               width: isVertical ? `${data.dividerHeight}px` : `${data.dividerWidth}px`, 
               height: isVertical ? `${data.dividerWidth}px` : `${data.dividerHeight}px`, 
               backgroundColor: data.dividerColor,
-              borderRadius: '2px'
             }} />
           </div>
         )}
