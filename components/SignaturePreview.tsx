@@ -20,17 +20,12 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
     return 'flex-start';
   };
 
-  const blockStyle = (x: number, y: number) => ({
-    transform: `translate(${x}px, ${y}px)`,
-    transition: 'none',
-  });
-
   const isVerticalMode = data.layoutMode === 'logo-top' || data.layoutMode === 'logo-bottom';
 
   // --- BLOC LOGO & SLOGAN ---
   const LogoBlock = (
     <div style={{ 
-      ...blockStyle(data.logoOffsetX, data.logoOffsetY),
+      transform: `translate(${data.logoOffsetX}px, ${data.logoOffsetY}px)`,
       display: 'flex',
       flexDirection: 'column',
       alignItems: getFlexAlign(data.logoAlign),
@@ -40,8 +35,8 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
       <div style={{ 
         backgroundColor: data.showLogoBackground ? data.logoBgColor : 'transparent',
         width: `${data.logoWidth}px`,
-        borderRadius: data.showLogoBackground ? '12px' : '0px',
-        padding: data.showLogoBackground ? '15px' : '0px',
+        borderRadius: data.showLogoBackground ? '8px' : '0px',
+        padding: data.showLogoBackground ? '12px' : '0px',
         marginBottom: `${data.logoFooterGap}px`,
         display: 'flex',
         justifyContent: 'center',
@@ -57,7 +52,7 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
       <div style={{ 
         color: data.primaryTextColor,
         fontSize: `${data.footerFontSize}px`,
-        width: `${data.logoWidth + (data.showLogoBackground ? 30 : 0)}px`,
+        width: `${data.logoWidth + (data.showLogoBackground ? 24 : 0)}px`,
         textAlign: data.footerTextAlign as any,
         fontWeight: '700',
         lineHeight: '1.2',
@@ -78,17 +73,17 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
   // --- BLOC INFORMATIONS ---
   const InfoBlock = (
     <div style={{ 
-      ...blockStyle(data.contactOffsetX, data.contactOffsetY),
+      transform: `translate(${data.contactOffsetX}px, ${data.contactOffsetY}px)`,
       display: 'flex',
       flexDirection: 'column',
       justifyContent: isVerticalMode ? 'flex-start' : data.contactVerticalAlign,
       fontFamily: "'Inter', sans-serif",
-      minWidth: '220px',
+      minWidth: '240px',
       flexShrink: 0,
     }}>
       {/* Nom & Titre */}
       <div style={{ 
-        ...blockStyle(data.nameOffsetX, data.nameOffsetY),
+        transform: `translate(${data.nameOffsetX}px, ${data.nameOffsetY}px)`,
         marginBottom: `${data.verticalSpacing}px`,
         textAlign: data.nameTitleAlign as any,
       }}>
@@ -148,7 +143,7 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
 
       {/* Website & Social */}
       <div style={{ 
-        ...blockStyle(data.websiteOffsetX, data.websiteOffsetY),
+        transform: `translate(${data.websiteOffsetX}px, ${data.websiteOffsetY}px)`,
         marginTop: '12px',
         display: 'flex',
         flexDirection: 'column',
@@ -156,17 +151,17 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
         textAlign: data.websiteAlign as any
       }}>
         {data.showWebsite && data.website && (
-          <div style={{ marginBottom: '8px' }}>
-            <a href={formatUrl(data.website)} target="_blank" rel="noopener noreferrer" style={{ color: data.primaryTextColor, fontSize: `${data.nameFontSize * 0.65}px`, fontWeight: '900', textDecoration: 'none', letterSpacing: '-0.01em', lineHeight: '1' }}>{data.website}</a>
+          <div style={{ marginBottom: '6px' }}>
+            <a href={formatUrl(data.website)} target="_blank" rel="noopener noreferrer" style={{ color: data.primaryTextColor, fontSize: `${data.nameFontSize * 0.6}px`, fontWeight: '900', textDecoration: 'none', letterSpacing: '-0.01em', lineHeight: '1' }}>{data.website}</a>
           </div>
         )}
         
         {data.showSocialIcons && (
-          <div style={{ display: 'flex', gap: '10px', justifyContent: getFlexAlign(data.websiteAlign) }}>
-            {data.socialLinks.facebook && <a href={formatUrl(data.socialLinks.facebook)}><FacebookIcon color={data.accentColor} size={data.iconSize + 2} /></a>}
-            {data.socialLinks.instagram && <a href={formatUrl(data.socialLinks.instagram)}><InstagramIcon color={data.accentColor} size={data.iconSize + 2} /></a>}
-            {data.socialLinks.linkedin && <a href={formatUrl(data.socialLinks.linkedin)}><LinkedinIcon color={data.accentColor} size={data.iconSize + 2} /></a>}
-            {data.socialLinks.twitter && <a href={formatUrl(data.socialLinks.twitter)}><TwitterIcon color={data.accentColor} size={data.iconSize + 2} /></a>}
+          <div style={{ display: 'flex', gap: '8px', justifyContent: getFlexAlign(data.websiteAlign) }}>
+            {data.socialLinks.facebook && <a href={formatUrl(data.socialLinks.facebook)}><FacebookIcon color={data.accentColor} size={data.iconSize} /></a>}
+            {data.socialLinks.instagram && <a href={formatUrl(data.socialLinks.instagram)}><InstagramIcon color={data.accentColor} size={data.iconSize} /></a>}
+            {data.socialLinks.linkedin && <a href={formatUrl(data.socialLinks.linkedin)}><LinkedinIcon color={data.accentColor} size={data.iconSize} /></a>}
+            {data.socialLinks.twitter && <a href={formatUrl(data.socialLinks.twitter)}><TwitterIcon color={data.accentColor} size={data.iconSize} /></a>}
           </div>
         )}
       </div>
@@ -184,39 +179,40 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
   return (
     <div id="signature-container" style={{ 
       backgroundColor: '#ffffff', 
-      padding: '30px', 
+      padding: '40px', 
       display: 'inline-block',
       fontFamily: "'Inter', sans-serif"
     }}>
       <div style={{ 
         display: 'flex', 
         flexDirection: getFlexDirection(),
-        alignItems: 'center', // Centrage vertical pour que les deux blocs soient face à face
-        gap: isVerticalMode ? '0px' : `${data.columnGap}px`,
-        whiteSpace: 'nowrap'
+        alignItems: isVerticalMode ? 'center' : 'center',
+        gap: isVerticalMode ? '20px' : `${data.columnGap}px`,
+        maxWidth: '100%'
       }}>
-        {/* On retire les wrappers div inutiles pour laisser le flex direct opérer */}
-        {LogoBlock}
+        {/* Colonne 1 : Logo */}
+        <div style={{ flexShrink: 0 }}>{LogoBlock}</div>
 
+        {/* Colonne 2 : Divider (Vertical si row, Horizontal si column) */}
         {data.dividerWidth > 0 && (
           <div style={{ 
             flexShrink: 0,
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center',
-            padding: isVerticalMode ? '20px 0' : '0'
+            padding: isVerticalMode ? '10px 0' : '0'
           }}>
             <div style={{ 
               width: isVerticalMode ? `${data.dividerHeight}px` : `${data.dividerWidth}px`, 
               height: isVerticalMode ? `${data.dividerWidth}px` : `${data.dividerHeight}px`, 
               backgroundColor: data.dividerColor,
-              borderRadius: '2px',
-              opacity: 0.8
+              borderRadius: '1px'
             }} />
           </div>
         )}
 
-        {InfoBlock}
+        {/* Colonne 3 : Infos */}
+        <div style={{ flexShrink: 0 }}>{InfoBlock}</div>
       </div>
     </div>
   );
