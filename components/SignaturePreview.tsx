@@ -25,17 +25,17 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
     transition: 'none',
   });
 
-  const isVertical = data.layoutMode === 'logo-top' || data.layoutMode === 'logo-bottom';
+  const isVerticalMode = data.layoutMode === 'logo-top' || data.layoutMode === 'logo-bottom';
 
-  // --- COMPOSANTS ---
-
+  // --- BLOC LOGO & SLOGAN ---
   const LogoBlock = (
     <div style={{ 
       ...blockStyle(data.logoOffsetX, data.logoOffsetY),
-      display: 'inline-flex',
+      display: 'flex',
       flexDirection: 'column',
       alignItems: getFlexAlign(data.logoAlign),
       textAlign: data.logoAlign as any,
+      flexShrink: 0,
     }}>
       <div style={{ 
         backgroundColor: data.showLogoBackground ? data.logoBgColor : 'transparent',
@@ -75,16 +75,18 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
     </div>
   );
 
+  // --- BLOC INFORMATIONS ---
   const InfoBlock = (
     <div style={{ 
       ...blockStyle(data.contactOffsetX, data.contactOffsetY),
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: isVertical ? 'flex-start' : data.contactVerticalAlign,
+      justifyContent: isVerticalMode ? 'flex-start' : data.contactVerticalAlign,
       fontFamily: "'Inter', sans-serif",
-      minWidth: '200px'
+      minWidth: '220px',
+      flexShrink: 0,
     }}>
-      {/* 1. Bloc Nom & Titre */}
+      {/* Nom & Titre */}
       <div style={{ 
         ...blockStyle(data.nameOffsetX, data.nameOffsetY),
         marginBottom: `${data.verticalSpacing}px`,
@@ -107,14 +109,14 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
             fontSize: `${data.jobTitleFontSize}px`, 
             opacity: 0.7, 
             fontWeight: '500',
-            marginTop: '1px'
+            marginTop: '2px'
           }}>
             {data.jobTitle}
           </div>
         )}
       </div>
 
-      {/* 2. Bloc Coordonnées (Chaque ligne est indépendante) */}
+      {/* Coordonnées */}
       <div style={{ textAlign: data.contactInfoAlign as any }}>
         {data.showEmail && data.email && (
           <div style={{ marginBottom: `${data.verticalSpacing}px`, display: 'flex', alignItems: 'center', gap: '8px', justifyContent: getFlexAlign(data.contactInfoAlign) }}>
@@ -144,10 +146,10 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
         )}
       </div>
 
-      {/* 3. Bloc Website & Social */}
+      {/* Website & Social */}
       <div style={{ 
         ...blockStyle(data.websiteOffsetX, data.websiteOffsetY),
-        marginTop: '10px',
+        marginTop: '12px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: getFlexAlign(data.websiteAlign),
@@ -189,28 +191,32 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
       <div style={{ 
         display: 'flex', 
         flexDirection: getFlexDirection(),
-        alignItems: isVertical ? 'center' : 'center', // Fixé à center pour stabiliser la ligne
-        gap: isVertical ? '0px' : `${data.columnGap}px`,
+        alignItems: 'center', // Centrage vertical pour que les deux blocs soient face à face
+        gap: isVerticalMode ? '0px' : `${data.columnGap}px`,
+        whiteSpace: 'nowrap'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>{LogoBlock}</div>
+        {/* On retire les wrappers div inutiles pour laisser le flex direct opérer */}
+        {LogoBlock}
 
         {data.dividerWidth > 0 && (
           <div style={{ 
+            flexShrink: 0,
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center',
-            padding: isVertical ? '15px 0' : '0'
+            padding: isVerticalMode ? '20px 0' : '0'
           }}>
             <div style={{ 
-              width: isVertical ? `${data.dividerHeight}px` : `${data.dividerWidth}px`, 
-              height: isVertical ? `${data.dividerWidth}px` : `${data.dividerHeight}px`, 
+              width: isVerticalMode ? `${data.dividerHeight}px` : `${data.dividerWidth}px`, 
+              height: isVerticalMode ? `${data.dividerWidth}px` : `${data.dividerHeight}px`, 
               backgroundColor: data.dividerColor,
-              borderRadius: '2px'
+              borderRadius: '2px',
+              opacity: 0.8
             }} />
           </div>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'center' }}>{InfoBlock}</div>
+        {InfoBlock}
       </div>
     </div>
   );
