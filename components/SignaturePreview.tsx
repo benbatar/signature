@@ -22,15 +22,14 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
 
   const isVerticalMode = data.layoutMode === 'logo-top' || data.layoutMode === 'logo-bottom';
 
-  // --- BLOC LOGO & SLOGAN ---
-  const LogoBlock = (
+  // --- BLOC LOGO ---
+  const LogoPart = (
     <div style={{ 
       transform: `translate(${data.logoOffsetX}px, ${data.logoOffsetY}px)`,
       display: 'flex',
       flexDirection: 'column',
       alignItems: getFlexAlign(data.logoAlign),
       textAlign: data.logoAlign as any,
-      flexShrink: 0,
     }}>
       <div style={{ 
         backgroundColor: data.showLogoBackground ? data.logoBgColor : 'transparent',
@@ -70,8 +69,8 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
     </div>
   );
 
-  // --- BLOC INFORMATIONS ---
-  const InfoBlock = (
+  // --- BLOC INFOS ---
+  const InfoPart = (
     <div style={{ 
       transform: `translate(${data.contactOffsetX}px, ${data.contactOffsetY}px)`,
       display: 'flex',
@@ -79,7 +78,6 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
       justifyContent: isVerticalMode ? 'flex-start' : data.contactVerticalAlign,
       fontFamily: "'Inter', sans-serif",
       minWidth: '240px',
-      flexShrink: 0,
     }}>
       {/* Nom & Titre */}
       <div style={{ 
@@ -168,51 +166,47 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
     </div>
   );
 
-  const getFlexDirection = () => {
-    if (data.layoutMode === 'logo-left') return 'row';
-    if (data.layoutMode === 'logo-right') return 'row-reverse';
-    if (data.layoutMode === 'logo-top') return 'column';
-    if (data.layoutMode === 'logo-bottom') return 'column-reverse';
-    return 'row';
-  };
+  // Utilisation d'un tableau HTML pour forcer l'alignement horizontal rigide
+  // C'est la méthode la plus fiable pour les signatures d'email et pour éviter les sauts de ligne Flexbox
+  if (!isVerticalMode) {
+    return (
+      <div id="signature-container" style={{ backgroundColor: '#ffffff', padding: '40px', display: 'inline-block' }}>
+        <table cellPadding="0" cellSpacing="0" style={{ borderCollapse: 'collapse', fontFamily: "'Inter', sans-serif" }}>
+          <tbody>
+            <tr>
+              <td style={{ verticalAlign: 'middle', paddingRight: `${data.columnGap / 2}px` }}>
+                {LogoPart}
+              </td>
+              {data.dividerWidth > 0 && (
+                <td style={{ verticalAlign: 'middle', padding: `0 ${data.columnGap / 2}px`, borderLeft: `${data.dividerWidth}px solid ${data.dividerColor}`, height: `${data.dividerHeight}px` }}>
+                  <div style={{ height: `${data.dividerHeight}px` }}></div>
+                </td>
+              )}
+              <td style={{ verticalAlign: 'middle', paddingLeft: data.dividerWidth > 0 ? `${data.columnGap / 2}px` : '0px' }}>
+                {InfoPart}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    );
+  }
 
+  // Pour le mode vertical
   return (
-    <div id="signature-container" style={{ 
-      backgroundColor: '#ffffff', 
-      padding: '40px', 
-      display: 'inline-block',
-      fontFamily: "'Inter', sans-serif"
-    }}>
+    <div id="signature-container" style={{ backgroundColor: '#ffffff', padding: '40px', display: 'inline-block' }}>
       <div style={{ 
         display: 'flex', 
-        flexDirection: getFlexDirection(),
-        alignItems: isVerticalMode ? 'center' : 'center',
-        gap: isVerticalMode ? '20px' : `${data.columnGap}px`,
-        maxWidth: '100%'
+        flexDirection: data.layoutMode === 'logo-top' ? 'column' : 'column-reverse',
+        alignItems: 'center',
+        gap: '20px',
+        fontFamily: "'Inter', sans-serif"
       }}>
-        {/* Colonne 1 : Logo */}
-        <div style={{ flexShrink: 0 }}>{LogoBlock}</div>
-
-        {/* Colonne 2 : Divider (Vertical si row, Horizontal si column) */}
+        {LogoPart}
         {data.dividerWidth > 0 && (
-          <div style={{ 
-            flexShrink: 0,
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            padding: isVerticalMode ? '10px 0' : '0'
-          }}>
-            <div style={{ 
-              width: isVerticalMode ? `${data.dividerHeight}px` : `${data.dividerWidth}px`, 
-              height: isVerticalMode ? `${data.dividerWidth}px` : `${data.dividerHeight}px`, 
-              backgroundColor: data.dividerColor,
-              borderRadius: '1px'
-            }} />
-          </div>
+          <div style={{ width: `${data.dividerHeight}px`, height: `${data.dividerWidth}px`, backgroundColor: data.dividerColor }}></div>
         )}
-
-        {/* Colonne 3 : Infos */}
-        <div style={{ flexShrink: 0 }}>{InfoBlock}</div>
+        {InfoPart}
       </div>
     </div>
   );
