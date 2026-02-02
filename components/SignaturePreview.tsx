@@ -22,7 +22,7 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
 
   const isVerticalMode = data.layoutMode === 'logo-top' || data.layoutMode === 'logo-bottom';
 
-  // --- BLOC LOGO ---
+  // --- BLOC LOGO & SLOGAN ---
   const LogoPart = (
     <div style={{ 
       transform: `translate(${data.logoOffsetX}px, ${data.logoOffsetY}px)`,
@@ -30,6 +30,8 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
       flexDirection: 'column',
       alignItems: getFlexAlign(data.logoAlign),
       textAlign: data.logoAlign as any,
+      flexShrink: 0,
+      width: `${data.logoWidth + (data.showLogoBackground ? 30 : 10)}px`,
     }}>
       <div style={{ 
         backgroundColor: data.showLogoBackground ? data.logoBgColor : 'transparent',
@@ -51,7 +53,7 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
       <div style={{ 
         color: data.primaryTextColor,
         fontSize: `${data.footerFontSize}px`,
-        width: `${data.logoWidth + (data.showLogoBackground ? 24 : 0)}px`,
+        width: '100%',
         textAlign: data.footerTextAlign as any,
         fontWeight: '700',
         lineHeight: '1.2',
@@ -69,7 +71,7 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
     </div>
   );
 
-  // --- BLOC INFOS ---
+  // --- BLOC INFORMATIONS ---
   const InfoPart = (
     <div style={{ 
       transform: `translate(${data.contactOffsetX}px, ${data.contactOffsetY}px)`,
@@ -77,7 +79,8 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
       flexDirection: 'column',
       justifyContent: isVerticalMode ? 'flex-start' : data.contactVerticalAlign,
       fontFamily: "'Inter', sans-serif",
-      minWidth: '240px',
+      minWidth: '220px',
+      flexShrink: 0,
     }}>
       {/* Nom & Titre */}
       <div style={{ 
@@ -166,47 +169,57 @@ const SignaturePreview: React.FC<Props> = ({ data }) => {
     </div>
   );
 
-  // Utilisation d'un tableau HTML pour forcer l'alignement horizontal rigide
-  // C'est la méthode la plus fiable pour les signatures d'email et pour éviter les sauts de ligne Flexbox
-  if (!isVerticalMode) {
-    return (
-      <div id="signature-container" style={{ backgroundColor: '#ffffff', padding: '40px', display: 'inline-block' }}>
-        <table cellPadding="0" cellSpacing="0" style={{ borderCollapse: 'collapse', fontFamily: "'Inter', sans-serif" }}>
-          <tbody>
-            <tr>
-              <td style={{ verticalAlign: 'middle', paddingRight: `${data.columnGap / 2}px` }}>
-                {LogoPart}
-              </td>
-              {data.dividerWidth > 0 && (
-                <td style={{ verticalAlign: 'middle', padding: `0 ${data.columnGap / 2}px`, borderLeft: `${data.dividerWidth}px solid ${data.dividerColor}`, height: `${data.dividerHeight}px` }}>
-                  <div style={{ height: `${data.dividerHeight}px` }}></div>
-                </td>
-              )}
-              <td style={{ verticalAlign: 'middle', paddingLeft: data.dividerWidth > 0 ? `${data.columnGap / 2}px` : '0px' }}>
-                {InfoPart}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    );
-  }
+  const getFlexDirection = () => {
+    if (data.layoutMode === 'logo-left') return 'row';
+    if (data.layoutMode === 'logo-right') return 'row-reverse';
+    if (data.layoutMode === 'logo-top') return 'column';
+    if (data.layoutMode === 'logo-bottom') return 'column-reverse';
+    return 'row';
+  };
 
-  // Pour le mode vertical
   return (
-    <div id="signature-container" style={{ backgroundColor: '#ffffff', padding: '40px', display: 'inline-block' }}>
+    <div id="signature-container" style={{ 
+      backgroundColor: '#ffffff', 
+      padding: '40px', 
+      display: 'inline-block',
+      fontFamily: "'Inter', sans-serif"
+    }}>
       <div style={{ 
         display: 'flex', 
-        flexDirection: data.layoutMode === 'logo-top' ? 'column' : 'column-reverse',
+        flexDirection: getFlexDirection(),
         alignItems: 'center',
-        gap: '20px',
-        fontFamily: "'Inter', sans-serif"
+        gap: isVerticalMode ? '24px' : `${data.columnGap}px`,
+        flexWrap: 'nowrap', // Force side-by-side
+        minWidth: isVerticalMode ? '0' : '400px'
       }}>
-        {LogoPart}
+        {/* LOGO */}
+        <div style={{ flexShrink: 0 }}>
+          {LogoPart}
+        </div>
+
+        {/* DIVIDER */}
         {data.dividerWidth > 0 && (
-          <div style={{ width: `${data.dividerHeight}px`, height: `${data.dividerWidth}px`, backgroundColor: data.dividerColor }}></div>
+          <div style={{ 
+            flexShrink: 0,
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            padding: isVerticalMode ? '0' : '0'
+          }}>
+            <div style={{ 
+              width: isVerticalMode ? `${data.dividerHeight}px` : `${data.dividerWidth}px`, 
+              height: isVerticalMode ? `${data.dividerWidth}px` : `${data.dividerHeight}px`, 
+              backgroundColor: data.dividerColor,
+              borderRadius: '2px',
+              opacity: 0.8
+            }} />
+          </div>
         )}
-        {InfoPart}
+
+        {/* INFOS */}
+        <div style={{ flexShrink: 0 }}>
+          {InfoPart}
+        </div>
       </div>
     </div>
   );
